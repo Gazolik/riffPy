@@ -51,6 +51,7 @@ class ChunkReader(object):
         """
         current_chunk = chunk.Chunk(file, bigendian=self.bigendian)
         chunk_name = current_chunk.getname()
+        print(chunk_name)
         chunk_size = current_chunk.getsize()
         if chunk_name == b'LIST':
             chunk_type = current_chunk.read(CHUNKTYPE_SIZE)
