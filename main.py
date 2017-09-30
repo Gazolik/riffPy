@@ -25,5 +25,5 @@ def read_write():
 
 
 if __name__ == '__main__':
-    #main_ui()
-    read_write()
+    main_ui()
+    #read_write()
