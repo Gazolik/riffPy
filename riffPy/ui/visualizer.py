@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, QModelIndex
 
 from .visualizer_ui import Ui_Form
 from .file_list import FileListWidget
-from .riffStructure.reader import ChunkReader
+from riffPy.riff.reader import ChunkReader
 from .tree import RiffModel
 
 class Visualizer(QtWidgets.QWidget, Ui_Form):

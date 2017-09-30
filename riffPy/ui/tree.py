@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QAbstractItemModel, QModelIndex, Qt, QMimeData, pyqtSignal
 import pickle
 
-from .riffStructure.chunk import FinalChunk, ListChunk
+from riffPy.riff.chunk import FinalChunk, ListChunk
 
 class TreeNode(object):
     def __init__(self, parent, row):
@@ -58,8 +58,15 @@ class TreeModel(QAbstractItemModel):
         node = parent_index.internalPointer()
         return node.childCount()
 
+    def columnCount(self, parent):
+        return 2
+
     def itemFromIndex(self, index):
         return index.internalPointer() if index.isValid() else self.rootNodes[0]
+
+
+
+
 
 
 class RiffNode(TreeNode):
@@ -88,8 +95,7 @@ class RiffModel(TreeModel):
     def _getRootNodes(self):
         return [RiffNode(self.rootElement, None, 0)]
 
-    def columnCount(self, parent):
-        return 2
+
 
     def data(self, index, role):
         if not index.isValid():
@@ -132,7 +138,6 @@ class RiffModel(TreeModel):
     def dropMimeData(self, mime_data, action, row, column, parent_index):
         if not mime_data.hasFormat('application/x-riffnode-item-instance'):
             return False
-        print('drop on ', self)
         item = pickle.loads(mime_data.data('application/x-riffnode-item-instance'))
         drop_parent = self.itemFromIndex(parent_index)
         if not isinstance(drop_parent.ref, ListChunk):
@@ -141,10 +146,12 @@ class RiffModel(TreeModel):
         else:
             parent = drop_parent
             row = parent.childCount()
+
+        # TODO Better solution without reloading whole model
+        self.beginResetModel()
         parent.ref.sub_chunks.insert(row, item)
-        print('in position ', row)
         parent.reload()
-        print("changed")
-        self.dataChanged.emit(parent_index, parent_index, [])
-        print('Emit signal')
+        self.endResetModel()
+
         return True
+

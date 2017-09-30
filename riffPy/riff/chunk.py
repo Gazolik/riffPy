@@ -21,7 +21,20 @@ class Chunk(object):
 
         :return: The total size of the chunk (including the header)
         """
-        return self.size + CHUNKHEADER_SIZE
+        total_size = self.size
+        if total_size % 2 != 0:
+            total_size += 1
+        return total_size + CHUNKHEADER_SIZE
+
+    def byte_serialize(self, bigendian=False):
+        """
+
+        :return: The chunk as serialized data
+        """
+        print('Appending chunk {} of size {}'.format(self.name, self.size))
+        serialized = b''
+        serialized += self.name
+        return serialized
 
 
 class ListChunk(Chunk):
@@ -39,8 +52,8 @@ class ListChunk(Chunk):
         """
         size = 0
         for chunk in self.sub_chunks:
-            size += chunk.size
-        return size
+            size += chunk.total_size
+        return size + CHUNKTYPE_SIZE
 
     @property
     def total_size(self):
@@ -49,10 +62,24 @@ class ListChunk(Chunk):
     def append(self, chunk: Chunk):
         self.sub_chunks.append(deepcopy(chunk))
 
+    def byte_serialize(self, bigendian=False):
+        serialized = super().byte_serialize()
+        serialized += self.size.to_bytes(4, 'little' if bigendian is False else 'big')
+        serialized += self.form_type
+        for sub in self.sub_chunks:
+            serialized += sub.byte_serialize()
+            if sub.size % 2 != 0:
+                serialized += b' '
+        return serialized
+
 
 class RiffChunk(ListChunk):
     def __init__(self, name, sub_chunks, form_type):
         super().__init__(name, sub_chunks, form_type)
+
+    @property
+    def size(self):
+        return super().size - CHUNKTYPE_SIZE
 
 
 class FinalChunk(Chunk):
@@ -67,3 +94,9 @@ class FinalChunk(Chunk):
     @property
     def size(self):
         return self._size
+
+    def byte_serialize(self, bigendian=False):
+        serialized = super().byte_serialize()
+        serialized += self.size.to_bytes(4, 'little' if bigendian is False else 'big')
+        serialized += self.data.content
+        return serialized
