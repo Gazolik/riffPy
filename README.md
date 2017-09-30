@@ -8,7 +8,6 @@ Read content of RIFF format files (.wav, .avi ...)
 ::
 	from riffPy.riff.reader import ChunkReader
 	from riffPy.riff.writer import ChunkWriter
-	
 	# Read riff from file
     riff = reader.read_riff('./input_file.wav')
 	# Modify the Riff structure
