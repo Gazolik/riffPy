@@ -5,7 +5,7 @@ Read content of RIFF format files (.wav, .avi ...)
 
 ## Usage
 
-::
+
 
 	from riffPy.riff.reader import ChunkReader
 	from riffPy.riff.writer import ChunkWriter
@@ -21,7 +21,7 @@ Read content of RIFF format files (.wav, .avi ...)
 The riffPy/ui package can help you to see the content of your file:
 
 install PyQt5
-::
+
 	$ pip install PyQt5
 
 Run the main.py file
